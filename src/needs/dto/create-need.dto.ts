@@ -1,30 +1,33 @@
 import { Type } from 'class-transformer';
 import {
   IsNotEmpty,
+  IsNotEmptyObject,
   IsNumber,
   IsOptional,
   ValidateNested,
 } from 'class-validator';
 
 class Coordinates {
+  @IsOptional()
   @IsNumber()
   latitude: number;
 
+  @IsOptional()
   @IsNumber()
   longitude: number;
 }
 
 class Address {
-  @IsNotEmpty()
+  @IsOptional()
   street: string;
 
   @IsNotEmpty()
   city: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   state: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   zip: string;
 }
 
@@ -40,10 +43,12 @@ export class CreateNeedDto {
 
   @ValidateNested()
   @Type(() => Coordinates)
+  @IsOptional()
   coordinates: Coordinates;
 
   @ValidateNested()
   @Type(() => Address)
+  @IsNotEmptyObject()
   address: Address;
 
   @IsOptional()

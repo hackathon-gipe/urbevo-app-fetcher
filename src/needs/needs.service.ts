@@ -20,16 +20,18 @@ export class NeedsService {
       needData.category,
       {
         city: needData.address.city,
-        state: needData.address.state,
-        zip: needData.address.zip,
-        full_address: `${needData.address.street} ${needData.address.city} ${needData.address.state} ${needData.address.zip}`,
+        state: needData.address.state || '',
+        zip: needData.address.zip || '',
+        full_address: `${needData.address.street || ''} ${
+          needData.address.city || ''
+        } ${needData.address.state} ${needData.address.zip || ''}`,
       },
       needData.extraData,
       new Date(),
       new Date(),
       undefined,
       undefined,
-      needData.coordinates,
+      needData.coordinates || {},
     );
 
     return this.needRepository.storeNeed(need);
