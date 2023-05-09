@@ -45,7 +45,7 @@ export class NeedsRepository {
       province: need.address.state,
       zip_code: need.address.zip,
       full_address: need.address.full_address,
-      relevance_score: 0,
+      relevance_score: 1,
       source_link: '',
       extraction_date: need.extractionDate.toISOString(),
       extra_details: need.extraData,
