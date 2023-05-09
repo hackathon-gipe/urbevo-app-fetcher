@@ -38,7 +38,7 @@ export class NeedsService {
   }
 
   async findBySourceAndLocality(
-    locality: string,
+    locality?: string,
     source?: string,
   ): Promise<SerializedNeed[]> {
     return this.needRepository.getNeedsBySourceAndLocality(locality, source);

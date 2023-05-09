@@ -5,6 +5,9 @@ import {
   QueryCommand,
   QueryCommandInput,
   QueryCommandOutput,
+  ScanCommand,
+  ScanCommandInput,
+  ScanCommandOutput,
   UpdateItemCommand,
   UpdateItemCommandInput,
   UpdateItemCommandOutput,
@@ -32,6 +35,14 @@ export class DynamoDBCLient {
     this.logger.debug(`Querying items: ${JSON.stringify(input)}`);
 
     const command = new QueryCommand(input);
+
+    return this.client.send(command);
+  }
+
+  public scanItems(input: ScanCommandInput): Promise<ScanCommandOutput> {
+    this.logger.debug(`Scanning items: ${JSON.stringify(input)}`);
+
+    const command = new ScanCommand(input);
 
     return this.client.send(command);
   }

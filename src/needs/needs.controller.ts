@@ -28,10 +28,6 @@ export class NeedsController {
     @Query('source') source: string,
     @Query('locality') locality: string,
   ) {
-    if (!locality) {
-      return [];
-    }
-
     return this.needsService.findBySourceAndLocality(locality, source);
   }
 

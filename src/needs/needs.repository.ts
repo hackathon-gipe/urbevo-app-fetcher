@@ -6,6 +6,7 @@ import {
   AttributeValue,
   PutItemCommandInput,
   QueryCommandInput,
+  ScanCommandInput,
   UpdateItemCommandInput,
 } from '@aws-sdk/client-dynamodb';
 import { marshall } from '@aws-sdk/util-dynamodb';
@@ -64,36 +65,62 @@ export class NeedsRepository {
   }
 
   async getNeedsBySourceAndLocality(
-    locality: string,
+    locality?: string,
     source?: string,
   ): Promise<SerializedNeed[]> {
-    const getItemCommandInput: QueryCommandInput = {
-      TableName: this.config.get<string>('CLEAN_NEEDS_TABLE', ''),
-      IndexName: 'locality_name-index',
-      KeyConditionExpression: 'locality_name = :locality',
-      ExpressionAttributeValues: {
-        ':locality': { S: locality },
-      },
-    };
+    let dynamoDBNeeds: Record<string, AttributeValue>[] | undefined;
+    if (locality) {
+      const getItemCommandInput: QueryCommandInput = {
+        TableName: this.config.get<string>('CLEAN_NEEDS_TABLE', ''),
+        IndexName: 'locality_name-index',
+        KeyConditionExpression: 'locality_name = :locality',
+        ExpressionAttributeValues: {
+          ':locality': { S: locality },
+        },
+      };
 
-    if (source) {
-      getItemCommandInput.FilterExpression = '#source = :source';
-      getItemCommandInput.ExpressionAttributeNames = {
-        '#source': 'source',
+      if (source) {
+        getItemCommandInput.FilterExpression = '#source = :source';
+        getItemCommandInput.ExpressionAttributeNames = {
+          '#source': 'source',
+        };
+        (
+          getItemCommandInput.ExpressionAttributeValues as Record<
+            string,
+            AttributeValue
+          >
+        )[':source'] = {
+          S: source,
+        };
+      }
+
+      dynamoDBNeeds = (
+        await this.dynamoDBClient.queryItems(getItemCommandInput)
+      ).Items;
+    } else {
+      const scanNeedsCommandInput: ScanCommandInput = {
+        TableName: this.config.get<string>('CLEAN_NEEDS_TABLE', ''),
+        Limit: 100,
       };
-      (
-        getItemCommandInput.ExpressionAttributeValues as Record<
-          string,
-          AttributeValue
-        >
-      )[':source'] = {
-        S: source,
-      };
+
+      if (source) {
+        scanNeedsCommandInput.FilterExpression = '#source = :source';
+        scanNeedsCommandInput.ExpressionAttributeNames = {
+          '#source': 'source',
+        };
+        scanNeedsCommandInput.ExpressionAttributeValues = {
+          [':source']: {
+            S: source,
+          },
+        };
+      }
+
+      dynamoDBNeeds = (
+        await this.dynamoDBClient.scanItems(scanNeedsCommandInput)
+      ).Items;
     }
 
-    const needs = await this.dynamoDBClient.queryItems(getItemCommandInput);
-
-    const serializedNeeds = needs.Items?.map((need) =>
+    const serializedNeeds = dynamoDBNeeds?.map((need) =>
       this.buildNeed(need).serialize(),
     );
 
