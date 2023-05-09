@@ -13,6 +13,9 @@ async function bootstrap() {
     new FastifyAdapter({
       logger: true,
     }),
+    {
+      cors: true,
+    },
   );
 
   app.useLogger(app.get(Logger));
