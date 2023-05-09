@@ -64,22 +64,33 @@ export class NeedsRepository {
   }
 
   async getNeedsBySourceAndLocality(
-    source: string,
     locality: string,
+    source?: string,
   ): Promise<SerializedNeed[]> {
     const getItemCommandInput: QueryCommandInput = {
       TableName: this.config.get<string>('CLEAN_NEEDS_TABLE', ''),
       IndexName: 'locality_name-index',
       KeyConditionExpression: 'locality_name = :locality',
-      FilterExpression: '#source = :source',
-      ExpressionAttributeNames: {
-        '#source': 'source',
-      },
       ExpressionAttributeValues: {
-        ':source': { S: source },
         ':locality': { S: locality },
       },
     };
+
+    if (source) {
+      getItemCommandInput.FilterExpression = '#source = :source';
+      getItemCommandInput.ExpressionAttributeNames = {
+        '#source': 'source',
+      };
+      (
+        getItemCommandInput.ExpressionAttributeValues as Record<
+          string,
+          AttributeValue
+        >
+      )[':source'] = {
+        S: source,
+      };
+    }
+
     const needs = await this.dynamoDBClient.queryItems(getItemCommandInput);
 
     const serializedNeeds = needs.Items?.map((need) =>

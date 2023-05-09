@@ -38,10 +38,10 @@ export class NeedsService {
   }
 
   async findBySourceAndLocality(
-    source: string,
     locality: string,
+    source?: string,
   ): Promise<SerializedNeed[]> {
-    return this.needRepository.getNeedsBySourceAndLocality(source, locality);
+    return this.needRepository.getNeedsBySourceAndLocality(locality, source);
   }
 
   async addLikeToNeed(id: string, like: number) {

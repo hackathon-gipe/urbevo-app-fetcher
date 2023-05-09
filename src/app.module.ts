@@ -5,7 +5,15 @@ import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 
 @Module({
-  imports: [NeedsModule, LoggerModule.forRoot(), ConfigModule.forRoot()],
+  imports: [
+    NeedsModule,
+    LoggerModule.forRoot({
+      pinoHttp: {
+        level: 'trace',
+      },
+    }),
+    ConfigModule.forRoot(),
+  ],
   controllers: [AppController],
   providers: [],
 })

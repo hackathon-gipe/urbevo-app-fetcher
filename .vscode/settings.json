@@ -6,6 +6,7 @@
         "source.fixAll.eslint"
     ],
     "conventionalCommits.scopes": [
-        "create-need"
+        "create-need",
+        "search-need"
     ]
 }
