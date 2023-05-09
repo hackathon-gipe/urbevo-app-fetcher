@@ -4,5 +4,8 @@
     "editor.codeActionsOnSave": [
         "source.formatDocument",
         "source.fixAll.eslint"
+    ],
+    "conventionalCommits.scopes": [
+        "create-need"
     ]
 }
